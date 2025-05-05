@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class CustomerController extends Controller
 {
@@ -60,5 +63,66 @@ class CustomerController extends Controller
         
         $user->load('orders');
         return view('admin.customers.show', compact('user'));
+    }
+    
+    public function edit(User $user)
+    {
+        if ($user->role !== 'customer') {
+            abort(404);
+        }
+        
+        $customer = Customer::where('user_id', $user->id)->first();
+        
+        return view('admin.customers.edit', compact('user', 'customer'));
+    }
+    
+    public function update(Request $request, User $user)
+    {
+        if ($user->role !== 'customer') {
+            abort(404);
+        }
+        
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($user->id),
+            ],
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string',
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
+        
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
+        
+        if ($request->filled('password')) {
+            $user->update([
+                'password' => Hash::make($request->password),
+            ]);
+        }
+        
+        $customer = Customer::firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'phone' => $request->phone,
+                'address' => $request->address,
+            ]
+        );
+        
+        if ($customer->exists) {
+            $customer->update([
+                'phone' => $request->phone,
+                'address' => $request->address,
+            ]);
+        }
+        
+        return redirect()->route('admin.customers.index')
+            ->with('success', 'Data pelanggan berhasil diperbarui');
     }
 }
