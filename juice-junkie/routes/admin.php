@@ -21,10 +21,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     
     // Orders
     Route::resource('orders', OrderController::class)->except(['create', 'store', 'destroy']);
+    Route::patch('/orders/{id}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
     
     // Customers
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
     Route::get('/customers/{user}', [CustomerController::class, 'show'])->name('customers.show');
+    Route::get('/customers/{user}/edit', [CustomerController::class, 'edit'])->name('customers.edit');
+    Route::put('/customers/{user}', [CustomerController::class, 'update'])->name('customers.update');
     
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
