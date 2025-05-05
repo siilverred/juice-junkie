@@ -74,4 +74,18 @@ class OrderController extends Controller
         return redirect()->route('admin.orders.show', $order)
             ->with('success', 'Status pesanan berhasil diperbarui');
     }
+    
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,processing,completed,cancelled',
+        ]);
+        
+        $order = Order::findOrFail($id);
+        $order->update([
+            'status' => $request->status,
+        ]);
+        
+        return redirect()->back()->with('success', 'Status pesanan berhasil diperbarui');
+    }
 }
