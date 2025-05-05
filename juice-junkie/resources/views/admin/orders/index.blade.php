@@ -1,5 +1,7 @@
 @extends('layouts.admin')
 
+@section('title', 'Daftar Pesanan')
+
 @section('content')
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-semibold">Daftar Pesanan</h1>
@@ -78,30 +80,20 @@
                                 <span class="text-sm font-medium text-gray-900">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if($order->status == 'pending')
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                        Pending
-                                    </span>
-                                @elseif($order->status == 'processing')
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                        Diproses
-                                    </span>
-                                @elseif($order->status == 'completed')
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        Selesai
-                                    </span>
-                                @else
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                        Dibatalkan
-                                    </span>
-                                @endif
+                                <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="status-update-form">
+                                    @csrf
+                                    @method('PATCH')
+                                    <select name="status" class="status-select border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" data-order-id="{{ $order->id }}">
+                                        <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                        <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>Diproses</option>
+                                        <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>Selesai</option>
+                                        <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
+                                    </select>
+                                </form>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <a href="{{ route('admin.orders.show', $order) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">
                                     <i class="fas fa-eye"></i> Detail
-                                </a>
-                                <a href="{{ route('admin.orders.edit', $order) }}" class="text-green-600 hover:text-green-900">
-                                    <i class="fas fa-edit"></i> Edit
                                 </a>
                             </td>
                         </tr>
@@ -118,4 +110,24 @@
     <div class="mt-4">
         {{ $orders->appends(request()->query())->links() }}
     </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const statusSelects = document.querySelectorAll('.status-select');
+        
+        statusSelects.forEach(select => {
+            select.addEventListener('change', function() {
+                const form = this.closest('form');
+                
+                // Show loading indicator or disable the select
+                this.disabled = true;
+                
+                // Submit the form
+                form.submit();
+            });
+        });
+    });
+</script>
 @endsection
