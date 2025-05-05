@@ -1,4 +1,7 @@
 @extends('layouts.admin')
+
+@section('title', 'Daftar Pelanggan')
+
 @section('content')
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-semibold">Daftar Pelanggan</h1>
@@ -74,8 +77,11 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{{ route('admin.customers.show', $customer) }}" class="text-indigo-600 hover:text-indigo-900">
+                                <a href="{{ route('admin.customers.show', $customer) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">
                                     <i class="fas fa-eye"></i> Detail
+                                </a>
+                                <a href="{{ route('admin.customers.edit', $customer) }}" class="text-green-600 hover:text-green-900">
+                                    <i class="fas fa-edit"></i> Edit
                                 </a>
                             </td>
                         </tr>
