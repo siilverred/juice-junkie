@@ -1,7 +1,5 @@
 @extends('layouts.admin')
 
-@section('title', 'Detail Pelanggan')
-
 @section('content')
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-semibold">Detail Pelanggan</h1>
